@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e9e6e">
+<title>Entrar · Protocolo Clínico</title>
+<link rel="icon" type="image/png" href="https://icons.iconarchive.com/icons/iconshock/super-vista-medical/256/stethoscope-icon.png">
+<style>
+:root{
+  --bg:#f3f7f4;
+  --bg-soft:#eaf3ec;
+  --surface:#ffffff;
+  --text:#0d1a13;
+  --text-2:#566661;
+  --text-3:#8a9994;
+  --bdr:rgba(13,26,19,.10);
+  --bdr-2:rgba(13,26,19,.18);
+  --primary:#0e9e6e;
+  --primary-d:#0a8459;
+  --primary-soft:#e7f5ee;
+  --danger:#c14a35;
+  --danger-soft:#fbece8;
+  --shadow-sm:0 1px 2px rgba(13,26,19,.04);
+  --shadow-md:0 1px 2px rgba(13,26,19,.04),0 12px 32px -8px rgba(13,26,19,.08);
+  --r:16px;
+  --rs:10px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  color:var(--text);
+  background:var(--bg);
+  background-image:
+    radial-gradient(1100px 600px at -10% -20%, rgba(14,158,110,.16), transparent 60%),
+    radial-gradient(900px 500px at 110% 120%, rgba(14,158,110,.10), transparent 55%);
+  min-height:100vh;
+  min-height:100dvh;
+  display:flex;align-items:center;justify-content:center;
+  padding:24px 20px;
+  -webkit-font-smoothing:antialiased;
+  font-size:15px;line-height:1.5;
+}
+.wrap{width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;gap:22px}
+.brand{display:flex;flex-direction:column;align-items:center;gap:10px}
+.brand-logo{
+  width:72px;height:72px;border-radius:22px;
+  background:var(--surface);
+  border:1px solid var(--bdr);
+  box-shadow:var(--shadow-sm);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.brand-logo::after{
+  content:"";position:absolute;inset:-6px;border-radius:28px;
+  border:1px dashed rgba(14,158,110,.35);opacity:.7;
+}
+.brand-logo img{width:48px;height:48px;display:block}
+.brand-name{font-size:14px;font-weight:600;color:var(--text-2);letter-spacing:.02em}
+.card{
+  width:100%;
+  background:var(--surface);
+  border:1px solid var(--bdr);
+  border-radius:var(--r);
+  padding:32px 28px 26px;
+  box-shadow:var(--shadow-md);
+}
+h1{
+  font-size:22px;font-weight:650;letter-spacing:-.01em;
+  text-align:center;margin-bottom:6px;
+}
+.lead{
+  font-size:13px;color:var(--text-3);text-align:center;
+  margin-bottom:24px;
+}
+.field{margin-bottom:14px}
+label{
+  display:block;font-size:12px;font-weight:550;color:var(--text-2);
+  margin-bottom:6px;letter-spacing:.01em;
+}
+.input-wrap{position:relative}
+.input{
+  width:100%;
+  padding:12px 14px;
+  font-size:14.5px;
+  color:var(--text);
+  background:var(--surface);
+  border:1px solid var(--bdr-2);
+  border-radius:var(--rs);
+  outline:none;
+  transition:border .12s ease, box-shadow .12s ease;
+  -webkit-appearance:none;appearance:none;
+}
+.input:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 4px rgba(14,158,110,.13);
+}
+.input::placeholder{color:var(--text-3)}
+.toggle-eye{
+  position:absolute;top:50%;right:6px;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;
+  width:34px;height:34px;border-radius:8px;
+  color:var(--text-3);display:flex;align-items:center;justify-content:center;
+  transition:color .12s, background .12s;
+}
+.toggle-eye:hover{color:var(--text-2);background:rgba(13,26,19,.04)}
+.toggle-eye svg{width:18px;height:18px}
+.alert{
+  display:none;
+  background:var(--danger-soft);color:var(--danger);
+  border:1px solid rgba(193,74,53,.22);
+  padding:10px 12px;border-radius:var(--rs);
+  font-size:13px;margin-bottom:14px;
+  display:none;align-items:flex-start;gap:8px;
+}
+.alert.show{display:flex}
+.alert svg{width:16px;height:16px;flex-shrink:0;margin-top:1px}
+.btn{
+  width:100%;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 16px;
+  background:var(--primary);
+  color:#fff;
+  border:none;
+  border-radius:var(--rs);
+  font-size:14.5px;font-weight:600;letter-spacing:.01em;
+  cursor:pointer;
+  margin-top:6px;
+  transition:background .12s ease, transform .06s ease;
+  box-shadow:0 4px 14px -6px rgba(14,158,110,.55);
+}
+.btn:hover{background:var(--primary-d)}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.62;cursor:not-allowed;transform:none}
+.spin{
+  width:16px;height:16px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.35);
+  border-top-color:#fff;animation:spin .7s linear infinite;
+  display:none;
+}
+.btn.loading .spin{display:block}
+.btn.loading .btn-label{opacity:.85}
+@keyframes spin{to{transform:rotate(360deg)}}
+.foot{
+  font-size:11.5px;color:var(--text-3);text-align:center;
+  margin-top:18px;letter-spacing:.02em;
+}
+@media(max-width:420px){
+  .card{padding:26px 20px 22px;border-radius:14px}
+  h1{font-size:20px}
+}
+@media(prefers-reduced-motion: reduce){
+  *{transition:none!important;animation:none!important}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="brand">
+    <div class="brand-logo">
+      <img src="https://icons.iconarchive.com/icons/iconshock/super-vista-medical/256/stethoscope-icon.png" alt="Protocolo Clínico">
+    </div>
+    <div class="brand-name">Protocolo Clínico</div>
+  </div>
+
+  <form class="card" id="form" autocomplete="on" novalidate>
+    <h1>Bem-vindo de volta</h1>
+    <div class="lead">Entre para acessar os protocolos</div>
+
+    <div class="alert" id="alert" role="alert" aria-live="polite">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span id="alertMsg"></span>
+    </div>
+
+    <div class="field">
+      <label for="usuario">Usuário</label>
+      <input class="input" id="usuario" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required>
+    </div>
+
+    <div class="field">
+      <label for="senha">Senha</label>
+      <div class="input-wrap">
+        <input class="input" id="senha" type="password" autocomplete="current-password" required style="padding-right:44px">
+        <button type="button" class="toggle-eye" id="togglePw" aria-label="Mostrar senha">
+          <svg id="eyeOn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <svg id="eyeOff" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.5 10.5 0 0 1 12 20c-7 0-11-8-11-8a18.7 18.7 0 0 1 5.06-5.94"/><path d="M22.54 12.88A18.6 18.6 0 0 0 23 12s-4-8-11-8a10.3 10.3 0 0 0-2.34.27"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <button type="submit" class="btn" id="btn">
+      <span class="btn-label">Entrar</span>
+      <span class="spin"></span>
+    </button>
+
+    <div class="foot">Acesso restrito · uso clínico</div>
+  </form>
+</main>
+
+<script>
+const SUPA_URL = 'https://nqmyzolpoffpazsgycqq.supabase.co';
+const SUPA_KEY = 'sb_publishable_N_f8dizm3fFs-T91K3dY-w_9q7KZIPt';
+
+const $ = id => document.getElementById(id);
+const form = $('form'), btn = $('btn'), alertEl = $('alert'), alertMsg = $('alertMsg');
+
+function showAlert(msg){ alertMsg.textContent = msg; alertEl.classList.add('show'); }
+function hideAlert(){ alertEl.classList.remove('show'); }
+function setLoading(on){
+  btn.disabled = on;
+  btn.classList.toggle('loading', on);
+  $('btn').querySelector('.btn-label').textContent = on ? 'Entrando…' : 'Entrar';
+}
+
+$('togglePw').addEventListener('click', () => {
+  const inp = $('senha');
+  const isPw = inp.type === 'password';
+  inp.type = isPw ? 'text' : 'password';
+  $('eyeOn').style.display = isPw ? 'none' : '';
+  $('eyeOff').style.display = isPw ? '' : 'none';
+});
+
+// mostra motivo se voltou deslogado (conta removida, desativada, expirada)
+try{
+  const reason = sessionStorage.getItem('pc_logout_reason');
+  if(reason){ sessionStorage.removeItem('pc_logout_reason'); showAlert(reason); }
+}catch{}
+
+// já logado? redireciona
+try{
+  const s = JSON.parse(localStorage.getItem('pc_session') || 'null');
+  if(s && s.usuario){
+    if(s.papel === 'admin') location.replace('admin.html');
+    else location.replace('index.html');
+  }
+}catch{}
+
+form.addEventListener('submit', async e => {
+  e.preventDefault();
+  hideAlert();
+  const usuario = $('usuario').value.trim();
+  const senha = $('senha').value;
+  if(!usuario || !senha){ showAlert('Preencha usuário e senha.'); return; }
+  setLoading(true);
+  try{
+    const u = new URL(SUPA_URL + '/rest/v1/usuarios');
+    u.searchParams.set('select','id,usuario,papel,expira_em,ativo');
+    u.searchParams.set('usuario','eq.' + usuario);
+    u.searchParams.set('senha','eq.' + senha);
+    u.searchParams.set('limit','1');
+    const res = await fetch(u, {
+      headers:{ apikey:SUPA_KEY, Authorization:'Bearer ' + SUPA_KEY }
+    });
+    if(!res.ok){
+      const t = await res.text();
+      throw new Error(t || ('HTTP ' + res.status));
+    }
+    const rows = await res.json();
+    if(!rows.length){ showAlert('Usuário ou senha inválidos.'); setLoading(false); return; }
+    const user = rows[0];
+    if(!user.ativo){ showAlert('Usuário desativado. Procure um administrador.'); setLoading(false); return; }
+    if(user.expira_em && new Date(user.expira_em) <= new Date()){
+      const d = new Date(user.expira_em).toLocaleDateString('pt-BR');
+      showAlert('Acesso expirado em ' + d + '. Procure um administrador.');
+      setLoading(false); return;
+    }
+    localStorage.setItem('pc_session', JSON.stringify({
+      id:user.id, usuario:user.usuario, papel:user.papel,
+      expira_em:user.expira_em, t:Date.now()
+    }));
+    if(user.papel === 'admin') location.href = 'admin.html';
+    else location.href = 'index.html';
+  }catch(err){
+    console.error(err);
+    showAlert('Erro de conexão. Verifique sua internet e tente de novo.');
+    setLoading(false);
+  }
+});
+</script>
+</body>
+</html>

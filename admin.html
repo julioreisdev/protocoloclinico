@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e9e6e">
+<title>Admin · Protocolo Clínico</title>
+<link rel="icon" type="image/png" href="https://icons.iconarchive.com/icons/iconshock/super-vista-medical/256/stethoscope-icon.png">
+<style>
+:root{
+  --bg:#f4f7f5;
+  --bg-2:#eef3ef;
+  --surface:#ffffff;
+  --surface-2:#fafbfa;
+  --text:#0d1a13;
+  --text-2:#566661;
+  --text-3:#8a9994;
+  --text-4:#b3bcb7;
+  --bdr:rgba(13,26,19,.08);
+  --bdr-2:rgba(13,26,19,.16);
+  --bdr-3:rgba(13,26,19,.26);
+  --primary:#0e9e6e;
+  --primary-d:#0a8459;
+  --primary-soft:#e7f5ee;
+  --primary-soft-2:#d4ecdf;
+  --accent:#c97c00;
+  --accent-soft:#fbf2e0;
+  --danger:#c14a35;
+  --danger-d:#a23a27;
+  --danger-soft:#fbece8;
+  --warn:#a86b00;
+  --warn-soft:#fbf3e0;
+  --info:#185fa5;
+  --info-soft:#e7f0fb;
+  --shadow-sm:0 1px 2px rgba(13,26,19,.04);
+  --shadow-md:0 1px 2px rgba(13,26,19,.04),0 12px 32px -8px rgba(13,26,19,.10);
+  --shadow-lg:0 10px 40px -12px rgba(13,26,19,.20);
+  --r:14px;
+  --rs:10px;
+  --rxs:8px;
+  --sidebar-w:240px;
+  --topbar-h:60px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  color:var(--text);
+  background:var(--bg);
+  font-size:14px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+button{font-family:inherit}
+input,textarea,select,button{font-family:inherit;font-size:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+
+/* =================== Layout =================== */
+.app{display:grid;grid-template-columns:var(--sidebar-w) 1fr;height:100vh;height:100dvh}
+.sidebar{
+  background:var(--surface);
+  border-right:1px solid var(--bdr);
+  display:flex;flex-direction:column;
+  height:100%;
+}
+.sb-head{padding:18px 18px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bdr)}
+.sb-logo{
+  width:38px;height:38px;border-radius:10px;
+  background:var(--primary-soft);border:1px solid var(--primary-soft-2);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.sb-logo img{width:26px;height:26px}
+.sb-title{font-size:13.5px;font-weight:600;line-height:1.25}
+.sb-sub{font-size:11px;color:var(--text-3);line-height:1.2;margin-top:2px}
+.sb-nav{flex:1;padding:14px 10px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+.sb-section-label{font-size:10.5px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;padding:10px 10px 4px}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 11px;border-radius:var(--rxs);
+  color:var(--text-2);font-size:13.5px;font-weight:500;
+  cursor:pointer;transition:background .12s, color .12s;
+  border:none;background:none;width:100%;text-align:left;
+}
+.nav-item svg{width:17px;height:17px;flex-shrink:0;opacity:.85}
+.nav-item:hover{background:var(--bg-2);color:var(--text)}
+.nav-item.active{background:var(--primary-soft);color:var(--primary-d);font-weight:600}
+.nav-item.active svg{opacity:1}
+.sb-foot{padding:12px;border-top:1px solid var(--bdr);background:var(--surface-2)}
+.user-chip{
+  display:flex;align-items:center;gap:10px;padding:8px;border-radius:var(--rxs);
+}
+.avatar{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--primary);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:600;flex-shrink:0;
+  text-transform:uppercase;
+}
+.user-name{font-size:13px;font-weight:600;line-height:1.2}
+.user-role{font-size:11px;color:var(--text-3);margin-top:1px}
+.logout-btn{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  width:100%;margin-top:8px;
+  padding:8px 10px;border-radius:var(--rxs);
+  background:transparent;border:1px solid var(--bdr-2);color:var(--text-2);
+  font-size:12.5px;font-weight:500;cursor:pointer;
+  transition:background .12s, color .12s, border-color .12s;
+}
+.logout-btn:hover{background:var(--danger-soft);color:var(--danger);border-color:rgba(193,74,53,.3)}
+.logout-btn svg{width:14px;height:14px}
+
+.main{display:flex;flex-direction:column;min-width:0;height:100%;overflow:hidden}
+.topbar{
+  height:var(--topbar-h);
+  border-bottom:1px solid var(--bdr);
+  background:var(--surface);
+  display:flex;align-items:center;
+  padding:0 22px;gap:14px;
+  flex-shrink:0;
+}
+.menu-btn{display:none;background:none;border:none;cursor:pointer;width:36px;height:36px;border-radius:var(--rxs);align-items:center;justify-content:center;color:var(--text-2)}
+.menu-btn:hover{background:var(--bg-2)}
+.menu-btn svg{width:20px;height:20px}
+.tb-title{font-size:17px;font-weight:600;letter-spacing:-.005em}
+.tb-spacer{flex:1}
+.tb-status{font-size:12px;color:var(--text-3);display:flex;align-items:center;gap:6px}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+
+.content{flex:1;overflow-y:auto;padding:24px 22px 60px;background:var(--bg)}
+.section{display:none}
+.section.active{display:block}
+
+/* =================== Cards / Tables =================== */
+.toolbar{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  margin-bottom:18px;
+}
+.search{
+  position:relative;flex:1;min-width:200px;max-width:380px;
+}
+.search input{
+  width:100%;padding:9px 12px 9px 34px;
+  background:var(--surface);
+  border:1px solid var(--bdr-2);border-radius:var(--rs);
+  font-size:13.5px;outline:none;
+  transition:border .12s, box-shadow .12s;
+}
+.search input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(14,158,110,.13)}
+.search svg{position:absolute;top:50%;left:11px;transform:translateY(-50%);width:14px;height:14px;color:var(--text-3)}
+.filter{
+  padding:9px 12px;background:var(--surface);
+  border:1px solid var(--bdr-2);border-radius:var(--rs);
+  font-size:13.5px;outline:none;cursor:pointer;
+  -webkit-appearance:none;appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23566661' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat:no-repeat;background-position:right 10px center;
+  padding-right:30px;
+  max-width:200px;
+}
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:9px 14px;
+  border-radius:var(--rs);
+  font-size:13px;font-weight:550;
+  border:1px solid transparent;
+  cursor:pointer;white-space:nowrap;
+  transition:background .12s, color .12s, border-color .12s, transform .06s;
+}
+.btn:active{transform:translateY(1px)}
+.btn svg{width:14px;height:14px}
+.btn-primary{background:var(--primary);color:#fff;box-shadow:0 4px 12px -6px rgba(14,158,110,.5)}
+.btn-primary:hover{background:var(--primary-d)}
+.btn-ghost{background:transparent;color:var(--text-2);border-color:var(--bdr-2)}
+.btn-ghost:hover{background:var(--bg-2);color:var(--text)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover{background:var(--danger-d)}
+.btn-danger-ghost{background:transparent;color:var(--danger);border-color:rgba(193,74,53,.3)}
+.btn-danger-ghost:hover{background:var(--danger-soft)}
+.btn-sm{padding:6px 10px;font-size:12px}
+.btn-icon{padding:7px;border-radius:var(--rxs)}
+.btn-icon svg{width:15px;height:15px}
+
+.card{
+  background:var(--surface);
+  border:1px solid var(--bdr);
+  border-radius:var(--r);
+  box-shadow:var(--shadow-sm);
+  overflow:hidden;
+}
+.card-pad{padding:18px}
+
+/* Dashboard cards */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+@media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{
+  background:var(--surface);border:1px solid var(--bdr);
+  border-radius:var(--r);padding:16px 18px;
+  display:flex;flex-direction:column;gap:8px;
+  position:relative;overflow:hidden;
+}
+.stat-label{font-size:12px;color:var(--text-3);font-weight:550;text-transform:uppercase;letter-spacing:.04em}
+.stat-value{font-size:28px;font-weight:650;line-height:1;letter-spacing:-.02em}
+.stat-icon{
+  position:absolute;top:14px;right:14px;
+  width:30px;height:30px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+}
+.stat-icon svg{width:16px;height:16px}
+.stat-icon.green{background:var(--primary-soft);color:var(--primary-d)}
+.stat-icon.orange{background:var(--accent-soft);color:var(--accent)}
+.stat-icon.blue{background:var(--info-soft);color:var(--info)}
+.stat-icon.purple{background:#f0e8fb;color:#6a3aa0}
+
+/* Table */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:13.5px}
+thead th{
+  text-align:left;font-weight:600;font-size:11.5px;
+  color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;
+  padding:12px 16px;border-bottom:1px solid var(--bdr);
+  background:var(--surface-2);position:sticky;top:0;z-index:1;
+}
+tbody td{
+  padding:12px 16px;border-bottom:1px solid var(--bdr);
+  vertical-align:middle;color:var(--text);
+}
+tbody tr:last-child td{border-bottom:none}
+tbody tr{transition:background .1s}
+tbody tr:hover{background:var(--bg-2)}
+.t-actions{display:flex;gap:4px;justify-content:flex-end}
+.t-title{font-weight:600;color:var(--text)}
+.t-sub{font-size:11.5px;color:var(--text-3);margin-top:2px}
+
+/* Badges */
+.badge{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;
+  border:1px solid;letter-spacing:.02em;
+  white-space:nowrap;
+}
+.badge-group{display:flex;flex-wrap:wrap;gap:4px}
+.badge-ab{background:var(--primary-soft);color:var(--primary-d);border-color:var(--primary-soft-2)}
+.badge-ref{background:var(--accent-soft);color:var(--accent);border-color:#ebd4a4}
+.badge-admin{background:var(--info-soft);color:var(--info);border-color:#b9d1ee}
+.badge-user{background:var(--bg-2);color:var(--text-2);border-color:var(--bdr-2)}
+.badge-ok{background:var(--primary-soft);color:var(--primary-d);border-color:var(--primary-soft-2)}
+.badge-off{background:var(--bg-2);color:var(--text-3);border-color:var(--bdr-2)}
+.badge-warn{background:var(--warn-soft);color:var(--warn);border-color:#ebd9a4}
+.badge-danger{background:var(--danger-soft);color:var(--danger);border-color:#ebbdb1}
+.badge-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+
+.empty-state{
+  padding:48px 20px;text-align:center;color:var(--text-3);
+}
+.empty-state svg{width:36px;height:36px;opacity:.5;margin-bottom:10px}
+.empty-state-title{font-size:14px;font-weight:600;color:var(--text-2);margin-bottom:4px}
+.empty-state-sub{font-size:12.5px}
+
+/* Loader */
+.loader{display:flex;justify-content:center;padding:40px}
+.spin{width:22px;height:22px;border-radius:50%;border:2.5px solid var(--bdr-2);border-top-color:var(--primary);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* =================== Drawer =================== */
+.drawer-overlay{
+  position:fixed;inset:0;background:rgba(13,26,19,.42);
+  opacity:0;pointer-events:none;
+  transition:opacity .2s ease;z-index:50;
+}
+.drawer-overlay.open{opacity:1;pointer-events:auto}
+.drawer{
+  position:fixed;top:0;right:0;bottom:0;
+  width:640px;max-width:100%;
+  background:var(--surface);
+  box-shadow:var(--shadow-lg);
+  display:flex;flex-direction:column;
+  transform:translateX(100%);
+  transition:transform .25s cubic-bezier(.2,.7,.2,1);
+  z-index:51;
+}
+.drawer.open{transform:translateX(0)}
+.drawer-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 22px;border-bottom:1px solid var(--bdr);flex-shrink:0;
+}
+.drawer-title{font-size:16px;font-weight:650;letter-spacing:-.005em}
+.drawer-close{
+  background:none;border:none;cursor:pointer;width:32px;height:32px;
+  border-radius:var(--rxs);color:var(--text-2);
+  display:flex;align-items:center;justify-content:center;
+}
+.drawer-close:hover{background:var(--bg-2);color:var(--text)}
+.drawer-close svg{width:18px;height:18px}
+.drawer-body{flex:1;overflow-y:auto;padding:22px}
+.drawer-foot{
+  padding:14px 22px;border-top:1px solid var(--bdr);
+  display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;
+  background:var(--surface-2);flex-shrink:0;
+}
+.drawer-foot .left{margin-right:auto}
+
+/* =================== Modal =================== */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(13,26,19,.42);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity .15s ease;z-index:60;
+  padding:16px;
+}
+.modal-overlay.open{opacity:1;pointer-events:auto}
+.modal{
+  background:var(--surface);
+  border-radius:var(--r);
+  max-width:460px;width:100%;
+  box-shadow:var(--shadow-lg);
+  transform:scale(.96);opacity:0;
+  transition:transform .15s, opacity .15s;
+  max-height:90vh;display:flex;flex-direction:column;
+}
+.modal-overlay.open .modal{transform:scale(1);opacity:1}
+.modal-head{padding:18px 22px 4px}
+.modal-title{font-size:16px;font-weight:650}
+.modal-body{padding:14px 22px 18px;overflow-y:auto}
+.modal-foot{padding:14px 22px;border-top:1px solid var(--bdr);display:flex;gap:8px;justify-content:flex-end;background:var(--surface-2)}
+.modal-msg{font-size:13.5px;color:var(--text-2);line-height:1.5}
+
+/* =================== Forms =================== */
+.field{margin-bottom:14px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+@media(max-width:520px){.field-row{grid-template-columns:1fr}}
+.lbl{display:block;font-size:12px;font-weight:550;color:var(--text-2);margin-bottom:6px;letter-spacing:.01em}
+.lbl-hint{font-size:11px;color:var(--text-3);font-weight:400;margin-left:4px}
+.inp,.tx,.sel{
+  width:100%;padding:9px 12px;
+  background:var(--surface);
+  border:1px solid var(--bdr-2);border-radius:var(--rs);
+  font-size:13.5px;color:var(--text);outline:none;
+  transition:border .12s, box-shadow .12s;
+  -webkit-appearance:none;appearance:none;
+}
+.tx{resize:vertical;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Menlo,monospace;font-size:13px;line-height:1.55;min-height:200px;white-space:pre-wrap}
+.sel{
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23566661' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat:no-repeat;background-position:right 10px center;
+  padding-right:30px;
+}
+.inp:focus,.tx:focus,.sel:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(14,158,110,.13)}
+.hint{font-size:11.5px;color:var(--text-3);margin-top:4px}
+
+.check{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text-2)}
+.check input{width:15px;height:15px;accent-color:var(--primary);cursor:pointer}
+
+/* Exames editor */
+.exams-editor{border:1px solid var(--bdr-2);border-radius:var(--rs);background:var(--surface-2);padding:10px}
+.exam-row{display:grid;grid-template-columns:1fr 110px 32px;gap:8px;align-items:center;margin-bottom:6px}
+.exam-row:last-of-type{margin-bottom:0}
+.exam-row .inp{padding:7px 10px;font-size:13px}
+.exam-toggle{
+  display:flex;border:1px solid var(--bdr-2);border-radius:8px;overflow:hidden;background:var(--surface);
+  font-size:11px;font-weight:600;
+}
+.exam-toggle button{
+  flex:1;padding:6px 4px;background:none;border:none;cursor:pointer;color:var(--text-3);
+  transition:background .12s, color .12s;
+}
+.exam-toggle button.on.ab{background:var(--primary-soft);color:var(--primary-d)}
+.exam-toggle button.on.ref{background:var(--accent-soft);color:var(--accent)}
+.exam-row .btn-icon{padding:6px;color:var(--text-3)}
+.exam-row .btn-icon:hover{color:var(--danger);background:var(--danger-soft)}
+.add-exam{
+  margin-top:8px;display:inline-flex;align-items:center;gap:5px;
+  padding:5px 10px;font-size:12px;font-weight:550;
+  background:none;border:1px dashed var(--bdr-2);border-radius:20px;
+  color:var(--text-2);cursor:pointer;
+  transition:background .12s, color .12s, border-color .12s;
+}
+.add-exam svg{width:12px;height:12px}
+.add-exam:hover{background:var(--primary-soft);color:var(--primary-d);border-color:var(--primary-soft-2)}
+
+/* =================== Toast =================== */
+.toast-wrap{
+  position:fixed;bottom:18px;right:18px;z-index:100;
+  display:flex;flex-direction:column-reverse;gap:8px;
+  pointer-events:none;
+}
+.toast{
+  background:var(--surface);
+  border:1px solid var(--bdr);
+  border-left:3px solid var(--primary);
+  border-radius:var(--rs);
+  padding:11px 14px;min-width:230px;max-width:360px;
+  font-size:13px;color:var(--text);
+  box-shadow:var(--shadow-md);
+  display:flex;align-items:flex-start;gap:10px;
+  pointer-events:auto;
+  transform:translateX(10px);opacity:0;
+  animation:toastIn .25s ease forwards;
+}
+.toast.err{border-left-color:var(--danger)}
+.toast.warn{border-left-color:var(--warn)}
+.toast svg{width:16px;height:16px;flex-shrink:0;margin-top:1px;color:var(--primary)}
+.toast.err svg{color:var(--danger)}
+.toast.warn svg{color:var(--warn)}
+@keyframes toastIn{to{transform:translateX(0);opacity:1}}
+
+/* =================== Responsive =================== */
+@media(max-width:880px){
+  .app{grid-template-columns:1fr}
+  .sidebar{
+    position:fixed;top:0;bottom:0;left:0;width:280px;z-index:40;
+    transform:translateX(-100%);transition:transform .25s ease;
+  }
+  body.nav-open .sidebar{transform:translateX(0);box-shadow:var(--shadow-lg)}
+  body.nav-open::before{
+    content:"";position:fixed;inset:0;background:rgba(13,26,19,.42);z-index:39;
+  }
+  .menu-btn{display:flex}
+  .content{padding:18px 16px 60px}
+  .topbar{padding:0 14px}
+}
+@media(max-width:520px){
+  .stats{grid-template-columns:1fr 1fr;gap:10px}
+  .stat-value{font-size:23px}
+  .toolbar{gap:8px}
+  .search{max-width:none;flex:1 1 100%;order:-1}
+  thead th, tbody td{padding:10px 12px}
+  .drawer{width:100%}
+}
+
+@media(prefers-reduced-motion: reduce){
+  *{transition:none!important;animation-duration:.001s!important}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sb-head">
+      <div class="sb-logo">
+        <img src="https://icons.iconarchive.com/icons/iconshock/super-vista-medical/256/stethoscope-icon.png" alt="">
+      </div>
+      <div>
+        <div class="sb-title">Protocolo Clínico</div>
+        <div class="sb-sub">Painel administrativo</div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section-label">Geral</div>
+      <button class="nav-item" data-section="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+        Dashboard
+      </button>
+
+      <div class="sb-section-label">Conteúdo</div>
+      <button class="nav-item" data-section="protocolos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+        Protocolos
+      </button>
+      <button class="nav-item" data-section="categorias">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+        Categorias
+      </button>
+
+      <div class="sb-section-label">Sistema</div>
+      <button class="nav-item" data-section="usuarios">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Usuários
+      </button>
+      <a class="nav-item" href="index.html" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Abrir consulta
+      </a>
+    </nav>
+    <div class="sb-foot">
+      <div class="user-chip">
+        <div class="avatar" id="userAvatar">A</div>
+        <div style="min-width:0;flex:1">
+          <div class="user-name" id="userName">—</div>
+          <div class="user-role" id="userRole">—</div>
+        </div>
+      </div>
+      <button class="logout-btn" id="logoutBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sair
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="tb-title" id="tbTitle">Dashboard</div>
+      <div class="tb-spacer"></div>
+      <div class="tb-status"><span class="status-dot"></span>Conectado ao Supabase</div>
+    </header>
+
+    <div class="content">
+
+      <!-- ============ DASHBOARD ============ -->
+      <section class="section" data-section="dashboard">
+        <div class="stats" id="stats">
+          <div class="stat"><div class="stat-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="stat-label">Protocolos</div><div class="stat-value" data-stat="protocolos">—</div></div>
+          <div class="stat"><div class="stat-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/></svg></div><div class="stat-label">Categorias</div><div class="stat-value" data-stat="categorias">—</div></div>
+          <div class="stat"><div class="stat-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/></svg></div><div class="stat-label">Usuários</div><div class="stat-value" data-stat="usuarios">—</div></div>
+          <div class="stat"><div class="stat-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="stat-label">Exames</div><div class="stat-value" data-stat="exames">—</div></div>
+        </div>
+
+        <div class="card">
+          <div style="padding:16px 18px 8px;border-bottom:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-size:14px;font-weight:600">Últimas atualizações</div>
+              <div style="font-size:12px;color:var(--text-3);margin-top:2px">Protocolos editados recentemente</div>
+            </div>
+          </div>
+          <div id="recentList" class="tbl-wrap"><div class="loader"><div class="spin"></div></div></div>
+        </div>
+      </section>
+
+      <!-- ============ PROTOCOLOS ============ -->
+      <section class="section" data-section="protocolos">
+        <div class="toolbar">
+          <div class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="search" id="protoSearch" placeholder="Buscar por título, CID ou texto…">
+          </div>
+          <select class="filter" id="protoFilter"><option value="">Todas categorias</option></select>
+          <button class="btn btn-primary" id="newProtoBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Novo protocolo
+          </button>
+        </div>
+        <div class="card">
+          <div id="protoList" class="tbl-wrap"><div class="loader"><div class="spin"></div></div></div>
+        </div>
+      </section>
+
+      <!-- ============ CATEGORIAS ============ -->
+      <section class="section" data-section="categorias">
+        <div class="toolbar">
+          <div style="flex:1"></div>
+          <button class="btn btn-primary" id="newCatBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nova categoria
+          </button>
+        </div>
+        <div class="card">
+          <div id="catList" class="tbl-wrap"><div class="loader"><div class="spin"></div></div></div>
+        </div>
+      </section>
+
+      <!-- ============ USUÁRIOS ============ -->
+      <section class="section" data-section="usuarios">
+        <div class="toolbar">
+          <div class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="search" id="userSearch" placeholder="Buscar usuário…">
+          </div>
+          <button class="btn btn-primary" id="newUserBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Novo usuário
+          </button>
+        </div>
+        <div class="card">
+          <div id="userList" class="tbl-wrap"><div class="loader"><div class="spin"></div></div></div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- Drawer: Protocolo -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="drawer-head">
+    <div class="drawer-title" id="drawerTitle">Novo protocolo</div>
+    <button class="drawer-close" id="drawerClose" aria-label="Fechar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="drawer-body">
+    <div class="field-row">
+      <div class="field">
+        <label class="lbl">Título <span class="lbl-hint">obrigatório</span></label>
+        <input type="text" class="inp" id="pTitulo">
+      </div>
+      <div class="field">
+        <label class="lbl">CID</label>
+        <input type="text" class="inp" id="pCid" placeholder="ex.: Z34">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label class="lbl">Categoria <span class="lbl-hint">obrigatório</span></label>
+        <select class="sel" id="pCategoria"></select>
+      </div>
+      <div class="field">
+        <label class="lbl">Chave (slug) <span class="lbl-hint">identificador único</span></label>
+        <input type="text" class="inp" id="pChave" placeholder="auto a partir do título">
+      </div>
+    </div>
+    <div class="field">
+      <label class="lbl">Texto do protocolo</label>
+      <textarea class="tx" id="pTexto" placeholder="Conteúdo completo do protocolo (texto livre, quebras de linha preservadas)…"></textarea>
+    </div>
+    <div class="field">
+      <label class="lbl">Exames</label>
+      <div class="exams-editor" id="examsEditor"></div>
+      <button type="button" class="add-exam" id="addExamBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Adicionar exame
+      </button>
+    </div>
+  </div>
+  <div class="drawer-foot">
+    <div class="left">
+      <button class="btn btn-danger-ghost" id="protoDeleteBtn" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+        Excluir
+      </button>
+    </div>
+    <button class="btn btn-ghost" id="drawerCancel">Cancelar</button>
+    <button class="btn btn-primary" id="protoSaveBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      Salvar
+    </button>
+  </div>
+</aside>
+
+<!-- Modal genérico -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <div class="modal-head"><div class="modal-title" id="modalTitle">Título</div></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot" id="modalFoot"></div>
+  </div>
+</div>
+
+<!-- Toasts -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+/* =================== Config / Session =================== */
+const SUPA_URL = 'https://nqmyzolpoffpazsgycqq.supabase.co';
+const SUPA_KEY = 'sb_publishable_N_f8dizm3fFs-T91K3dY-w_9q7KZIPt';
+
+let SESSION = null;
+try{ SESSION = JSON.parse(localStorage.getItem('pc_session') || 'null'); }catch{}
+function forceLogout(reason){
+  localStorage.removeItem('pc_session');
+  if(reason){ try{ sessionStorage.setItem('pc_logout_reason', reason); }catch{} }
+  location.replace('login.html');
+}
+if(!SESSION || !SESSION.usuario){ forceLogout(); }
+if(SESSION && SESSION.papel !== 'admin'){ location.replace('index.html'); }
+
+/* =================== Helpers =================== */
+const $ = id => document.getElementById(id);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtDate = iso => { if(!iso) return '—'; const d = new Date(iso); return d.toLocaleDateString('pt-BR'); };
+const fmtDateTime = iso => { if(!iso) return '—'; const d = new Date(iso); return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); };
+const slugify = s => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'').slice(0,60);
+
+function toast(msg, type='ok'){
+  const el = document.createElement('div');
+  el.className = 'toast' + (type === 'err' ? ' err' : type === 'warn' ? ' warn' : '');
+  const icon = type === 'err'
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  el.innerHTML = icon + '<div>' + esc(msg) + '</div>';
+  $('toastWrap').appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateX(10px)'; setTimeout(() => el.remove(), 220); }, 3000);
+}
+
+/* =================== API (Supabase REST) =================== */
+const baseHeaders = { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY };
+async function sb(path, opts = {}){
+  const res = await fetch(SUPA_URL + '/rest/v1/' + path, {
+    ...opts,
+    headers: {
+      ...baseHeaders,
+      'Content-Type': 'application/json',
+      ...(opts.headers || {})
+    }
+  });
+  if(!res.ok){
+    const t = await res.text();
+    throw new Error(t || ('HTTP ' + res.status));
+  }
+  if(res.status === 204) return null;
+  return res.json();
+}
+const api = {
+  get: (path) => sb(path),
+  post: (path, body) => sb(path, { method:'POST', body: JSON.stringify(body), headers:{ Prefer:'return=representation' } }),
+  patch: (path, body) => sb(path, { method:'PATCH', body: JSON.stringify(body), headers:{ Prefer:'return=representation' } }),
+  del: (path) => sb(path, { method:'DELETE' })
+};
+
+/* =================== Session header =================== */
+$('userName').textContent = SESSION.usuario;
+$('userRole').textContent = SESSION.papel === 'admin' ? 'Administrador' : 'Usuário';
+$('userAvatar').textContent = (SESSION.usuario || '?').slice(0,1);
+$('logoutBtn').onclick = () => forceLogout();
+
+async function validateSession(){
+  try{
+    const rows = await api.get('usuarios?id=eq.' + encodeURIComponent(SESSION.id) + '&select=id,papel,expira_em,ativo&limit=1');
+    if(!rows.length) return forceLogout('Sua conta foi removida.');
+    const u = rows[0];
+    if(!u.ativo) return forceLogout('Sua conta foi desativada.');
+    if(u.expira_em && new Date(u.expira_em) <= new Date()) return forceLogout('Seu acesso expirou.');
+    if(u.papel !== 'admin') return forceLogout('Seu papel foi alterado. Faça login novamente.');
+  }catch(err){ /* não desloga em erro de rede */ }
+}
+setInterval(validateSession, 60_000);
+document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') validateSession(); });
+$('menuBtn').onclick = () => document.body.classList.toggle('nav-open');
+
+/* =================== Navigation =================== */
+const SECTIONS = ['dashboard','protocolos','categorias','usuarios'];
+const TITLES = { dashboard:'Dashboard', protocolos:'Protocolos', categorias:'Categorias', usuarios:'Usuários' };
+function go(section){
+  if(!SECTIONS.includes(section)) section = 'dashboard';
+  $$('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.section === section));
+  $$('.section').forEach(s => s.classList.toggle('active', s.dataset.section === section));
+  $('tbTitle').textContent = TITLES[section];
+  if(location.hash !== '#' + section) location.hash = section;
+  document.body.classList.remove('nav-open');
+  if(section === 'dashboard') loadDashboard();
+  if(section === 'protocolos') loadProtocolos();
+  if(section === 'categorias') loadCategorias();
+  if(section === 'usuarios') loadUsuarios();
+}
+$$('.nav-item').forEach(n => {
+  if(n.dataset.section) n.addEventListener('click', () => go(n.dataset.section));
+});
+window.addEventListener('hashchange', () => go(location.hash.replace('#','')));
+
+/* =================== Modal =================== */
+function modal({ title, body, actions }){
+  $('modalTitle').textContent = title;
+  $('modalBody').innerHTML = body;
+  $('modalFoot').innerHTML = '';
+  actions.forEach(a => {
+    const b = document.createElement('button');
+    b.className = 'btn ' + (a.cls || 'btn-ghost');
+    b.textContent = a.label;
+    b.onclick = () => { a.onClick && a.onClick(); };
+    $('modalFoot').appendChild(b);
+  });
+  $('modalOverlay').classList.add('open');
+}
+function closeModal(){ $('modalOverlay').classList.remove('open'); }
+$('modalOverlay').addEventListener('click', e => { if(e.target === $('modalOverlay')) closeModal(); });
+function confirm2({ title='Confirmar', msg, danger=false, okLabel='Confirmar' }){
+  return new Promise(resolve => {
+    modal({
+      title,
+      body: '<div class="modal-msg">' + esc(msg) + '</div>',
+      actions: [
+        { label:'Cancelar', cls:'btn-ghost', onClick:() => { closeModal(); resolve(false); } },
+        { label:okLabel, cls: danger ? 'btn-danger' : 'btn-primary', onClick:() => { closeModal(); resolve(true); } }
+      ]
+    });
+  });
+}
+
+/* =================== Drawer =================== */
+function openDrawer(){ $('drawer').classList.add('open'); $('drawerOverlay').classList.add('open'); $('drawer').setAttribute('aria-hidden','false'); }
+function closeDrawer(){ $('drawer').classList.remove('open'); $('drawerOverlay').classList.remove('open'); $('drawer').setAttribute('aria-hidden','true'); }
+$('drawerClose').onclick = closeDrawer;
+$('drawerCancel').onclick = closeDrawer;
+$('drawerOverlay').onclick = closeDrawer;
+
+/* =================== DASHBOARD =================== */
+async function loadDashboard(){
+  try{
+    const [c, p, u, e] = await Promise.all([
+      fetch(SUPA_URL + '/rest/v1/categorias?select=id', { headers:{...baseHeaders, Prefer:'count=exact', Range:'0-0'} }),
+      fetch(SUPA_URL + '/rest/v1/protocolos?select=id', { headers:{...baseHeaders, Prefer:'count=exact', Range:'0-0'} }),
+      fetch(SUPA_URL + '/rest/v1/usuarios?select=id',   { headers:{...baseHeaders, Prefer:'count=exact', Range:'0-0'} }),
+      fetch(SUPA_URL + '/rest/v1/exames?select=id',     { headers:{...baseHeaders, Prefer:'count=exact', Range:'0-0'} })
+    ]);
+    const getCount = r => Number((r.headers.get('content-range') || '0/0').split('/')[1] || 0);
+    document.querySelector('[data-stat="categorias"]').textContent = getCount(c);
+    document.querySelector('[data-stat="protocolos"]').textContent = getCount(p);
+    document.querySelector('[data-stat="usuarios"]').textContent   = getCount(u);
+    document.querySelector('[data-stat="exames"]').textContent     = getCount(e);
+
+    const recent = await api.get('protocolos?select=id,titulo,cid,atualizado_em,categoria:categorias(nome)&order=atualizado_em.desc&limit=8');
+    if(!recent.length){
+      $('recentList').innerHTML = '<div class="empty-state"><div class="empty-state-title">Nenhum protocolo</div></div>';
+      return;
+    }
+    $('recentList').innerHTML = `
+      <table><thead><tr><th>Protocolo</th><th>Categoria</th><th>CID</th><th>Atualizado</th></tr></thead>
+      <tbody>${recent.map(r => `
+        <tr><td><div class="t-title">${esc(r.titulo)}</div></td>
+        <td>${esc(r.categoria?.nome || '—')}</td>
+        <td>${esc(r.cid || '—')}</td>
+        <td>${esc(fmtDateTime(r.atualizado_em))}</td></tr>
+      `).join('')}</tbody></table>`;
+  }catch(err){
+    console.error(err); toast('Erro ao carregar dashboard', 'err');
+  }
+}
+
+/* =================== CATEGORIAS =================== */
+let CATEGORIAS_CACHE = [];
+async function loadCategorias(){
+  $('catList').innerHTML = '<div class="loader"><div class="spin"></div></div>';
+  try{
+    const rows = await api.get('categorias?select=id,nome,ordem&order=ordem');
+    CATEGORIAS_CACHE = rows;
+    if(!rows.length){
+      $('catList').innerHTML = '<div class="empty-state"><div class="empty-state-title">Nenhuma categoria</div><div class="empty-state-sub">Clique em "Nova categoria" para começar</div></div>';
+      return;
+    }
+    $('catList').innerHTML = `
+      <table><thead><tr><th style="width:60px">#</th><th>Nome</th><th style="width:140px;text-align:right">Ações</th></tr></thead>
+      <tbody>${rows.map(c => `
+        <tr><td style="color:var(--text-3)">${c.ordem}</td>
+        <td><div class="t-title">${esc(c.nome)}</div></td>
+        <td><div class="t-actions">
+          <button class="btn btn-ghost btn-icon" data-edit-cat="${c.id}" title="Editar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+          <button class="btn btn-danger-ghost btn-icon" data-del-cat="${c.id}" title="Excluir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
+        </div></td></tr>
+      `).join('')}</tbody></table>`;
+    $$('[data-edit-cat]').forEach(b => b.onclick = () => editCategoria(b.dataset.editCat));
+    $$('[data-del-cat]').forEach(b => b.onclick = () => deleteCategoria(b.dataset.delCat));
+  }catch(err){ console.error(err); toast('Erro ao carregar categorias', 'err'); }
+}
+$('newCatBtn').onclick = () => formCategoria();
+
+function formCategoria(cat){
+  const editing = !!cat;
+  modal({
+    title: editing ? 'Editar categoria' : 'Nova categoria',
+    body: `
+      <div class="field"><label class="lbl">Nome</label><input class="inp" id="m_cat_nome" value="${esc(cat?.nome || '')}"></div>
+      <div class="field"><label class="lbl">Ordem <span class="lbl-hint">menor aparece primeiro</span></label><input class="inp" id="m_cat_ordem" type="number" value="${cat?.ordem ?? (CATEGORIAS_CACHE.length + 1)}"></div>
+    `,
+    actions: [
+      { label:'Cancelar', cls:'btn-ghost', onClick:closeModal },
+      { label: editing ? 'Salvar' : 'Criar', cls:'btn-primary', onClick: async () => {
+        const nome = $('m_cat_nome').value.trim();
+        const ordem = parseInt($('m_cat_ordem').value, 10) || 0;
+        if(!nome) return toast('Informe o nome', 'err');
+        try{
+          if(editing) await api.patch('categorias?id=eq.' + cat.id, { nome, ordem });
+          else await api.post('categorias', { nome, ordem });
+          closeModal(); toast(editing ? 'Categoria atualizada' : 'Categoria criada');
+          loadCategorias();
+        }catch(err){ toast('Erro: ' + err.message, 'err'); }
+      }}
+    ]
+  });
+  setTimeout(() => $('m_cat_nome').focus(), 50);
+}
+async function editCategoria(id){
+  const cat = CATEGORIAS_CACHE.find(c => c.id == id);
+  if(cat) formCategoria(cat);
+}
+async function deleteCategoria(id){
+  const cat = CATEGORIAS_CACHE.find(c => c.id == id);
+  const ok = await confirm2({
+    title:'Excluir categoria',
+    msg:`Excluir "${cat?.nome}"? Protocolos vinculados a ela não poderão ser excluídos automaticamente — você precisará reatribuí-los.`,
+    danger:true, okLabel:'Excluir'
+  });
+  if(!ok) return;
+  try{ await api.del('categorias?id=eq.' + id); toast('Categoria excluída'); loadCategorias(); }
+  catch(err){ toast('Não foi possível excluir (há protocolos vinculados?)', 'err'); }
+}
+
+/* =================== PROTOCOLOS =================== */
+let PROTOS_CACHE = [];
+let EXAMES_CACHE_BY_PROTO = {};
+
+async function loadProtocolos(){
+  $('protoList').innerHTML = '<div class="loader"><div class="spin"></div></div>';
+  try{
+    // garantir categorias para filtros/forma
+    if(!CATEGORIAS_CACHE.length){
+      CATEGORIAS_CACHE = await api.get('categorias?select=id,nome,ordem&order=ordem');
+    }
+    // popular filtro
+    const filterSel = $('protoFilter');
+    filterSel.innerHTML = '<option value="">Todas categorias</option>' + CATEGORIAS_CACHE.map(c => `<option value="${c.id}">${esc(c.nome)}</option>`).join('');
+
+    const [protos, exames] = await Promise.all([
+      api.get('protocolos?select=id,chave,titulo,cid,texto,categoria_id,atualizado_em,categoria:categorias(id,nome)&order=titulo'),
+      api.get('exames?select=id,protocolo_id,nome,atencao_basica,ordem&order=ordem')
+    ]);
+    PROTOS_CACHE = protos;
+    EXAMES_CACHE_BY_PROTO = {};
+    exames.forEach(e => {
+      (EXAMES_CACHE_BY_PROTO[e.protocolo_id] = EXAMES_CACHE_BY_PROTO[e.protocolo_id] || []).push(e);
+    });
+    renderProtos();
+  }catch(err){ console.error(err); toast('Erro ao carregar protocolos', 'err'); }
+}
+function renderProtos(){
+  const q = $('protoSearch').value.trim().toLowerCase();
+  const cat = $('protoFilter').value;
+  let rows = PROTOS_CACHE;
+  if(cat) rows = rows.filter(r => r.categoria_id == cat);
+  if(q) rows = rows.filter(r =>
+    (r.titulo||'').toLowerCase().includes(q) ||
+    (r.cid||'').toLowerCase().includes(q) ||
+    (r.chave||'').toLowerCase().includes(q) ||
+    (r.texto||'').toLowerCase().includes(q)
+  );
+  if(!rows.length){
+    $('protoList').innerHTML = '<div class="empty-state"><div class="empty-state-title">Nenhum protocolo</div><div class="empty-state-sub">Ajuste a busca ou crie um novo</div></div>';
+    return;
+  }
+  $('protoList').innerHTML = `
+    <table>
+      <thead><tr><th>Protocolo</th><th>Categoria</th><th>Exames</th><th>Atualizado</th><th style="text-align:right">Ações</th></tr></thead>
+      <tbody>${rows.map(r => {
+        const exs = EXAMES_CACHE_BY_PROTO[r.id] || [];
+        const ab = exs.filter(e => e.atencao_basica).length;
+        const ref = exs.length - ab;
+        return `
+          <tr>
+            <td>
+              <div class="t-title">${esc(r.titulo)}</div>
+              <div class="t-sub">${esc(r.cid || '—')} · ${esc(r.chave)}</div>
+            </td>
+            <td>${esc(r.categoria?.nome || '—')}</td>
+            <td>
+              <div class="badge-group">
+                <span class="badge badge-ab"><span class="badge-dot"></span>AB ${ab}</span>
+                <span class="badge badge-ref"><span class="badge-dot"></span>Ref ${ref}</span>
+              </div>
+            </td>
+            <td style="color:var(--text-3);font-size:12.5px">${esc(fmtDate(r.atualizado_em))}</td>
+            <td><div class="t-actions">
+              <button class="btn btn-ghost btn-icon" data-edit-proto="${r.id}" title="Editar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+            </div></td>
+          </tr>`;
+      }).join('')}</tbody>
+    </table>`;
+  $$('[data-edit-proto]').forEach(b => b.onclick = () => openProtoDrawer(b.dataset.editProto));
+}
+$('protoSearch').addEventListener('input', renderProtos);
+$('protoFilter').addEventListener('change', renderProtos);
+$('newProtoBtn').onclick = () => openProtoDrawer(null);
+
+let _editingProtoId = null;
+let _editingExams = []; // [{id?, nome, atencao_basica, ordem, _tmp?}]
+
+function openProtoDrawer(id){
+  _editingProtoId = id;
+  const p = id ? PROTOS_CACHE.find(x => x.id === id) : null;
+  $('drawerTitle').textContent = id ? 'Editar protocolo' : 'Novo protocolo';
+  $('protoDeleteBtn').style.display = id ? '' : 'none';
+
+  // selects categoria
+  $('pCategoria').innerHTML = CATEGORIAS_CACHE.map(c => `<option value="${c.id}">${esc(c.nome)}</option>`).join('');
+  $('pCategoria').value = p?.categoria_id || (CATEGORIAS_CACHE[0]?.id || '');
+
+  $('pTitulo').value = p?.titulo || '';
+  $('pCid').value = p?.cid || '';
+  $('pChave').value = p?.chave || '';
+  $('pTexto').value = p?.texto || '';
+
+  _editingExams = (id ? (EXAMES_CACHE_BY_PROTO[id] || []) : []).map(e => ({...e}));
+  renderExamsEditor();
+  openDrawer();
+  setTimeout(() => $('pTitulo').focus(), 250);
+}
+
+$('pTitulo').addEventListener('input', () => {
+  if(_editingProtoId) return; // não sobrescreve em edição
+  $('pChave').value = slugify($('pTitulo').value);
+});
+
+function renderExamsEditor(){
+  if(!_editingExams.length){
+    $('examsEditor').innerHTML = '<div style="font-size:12.5px;color:var(--text-3);text-align:center;padding:14px">Nenhum exame</div>';
+    return;
+  }
+  $('examsEditor').innerHTML = _editingExams.map((e, i) => `
+    <div class="exam-row">
+      <input class="inp" data-exam-name="${i}" value="${esc(e.nome)}" placeholder="Nome do exame">
+      <div class="exam-toggle">
+        <button type="button" data-exam-toggle="${i}" data-val="true" class="${e.atencao_basica ? 'on ab' : ''}">AB</button>
+        <button type="button" data-exam-toggle="${i}" data-val="false" class="${!e.atencao_basica ? 'on ref' : ''}">Ref</button>
+      </div>
+      <button type="button" class="btn-icon" data-exam-del="${i}" title="Remover"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
+    </div>
+  `).join('');
+  $$('[data-exam-name]').forEach(inp => inp.oninput = e => { _editingExams[+inp.dataset.examName].nome = e.target.value; });
+  $$('[data-exam-toggle]').forEach(btn => btn.onclick = () => {
+    const i = +btn.dataset.examToggle;
+    _editingExams[i].atencao_basica = btn.dataset.val === 'true';
+    renderExamsEditor();
+  });
+  $$('[data-exam-del]').forEach(btn => btn.onclick = () => {
+    _editingExams.splice(+btn.dataset.examDel, 1);
+    renderExamsEditor();
+  });
+}
+$('addExamBtn').onclick = () => {
+  _editingExams.push({ nome:'', atencao_basica:true, ordem: _editingExams.length + 1, _new:true });
+  renderExamsEditor();
+  setTimeout(() => {
+    const inputs = $$('[data-exam-name]');
+    inputs[inputs.length - 1]?.focus();
+  }, 30);
+};
+
+$('protoSaveBtn').onclick = async () => {
+  const titulo = $('pTitulo').value.trim();
+  const cid    = $('pCid').value.trim();
+  const chave  = ($('pChave').value.trim() || slugify(titulo));
+  const categoria_id = parseInt($('pCategoria').value, 10);
+  const texto  = $('pTexto').value;
+  if(!titulo) return toast('Informe o título', 'err');
+  if(!categoria_id) return toast('Selecione a categoria', 'err');
+  if(!chave) return toast('Informe a chave (slug)', 'err');
+  $('protoSaveBtn').disabled = true;
+  try{
+    let protoId = _editingProtoId;
+    if(protoId){
+      await api.patch('protocolos?id=eq.' + protoId, { chave, titulo, cid, texto, categoria_id });
+    }else{
+      const created = await api.post('protocolos', { chave, titulo, cid, texto, categoria_id });
+      protoId = created[0].id;
+    }
+    // sync exames: deleta todos do proto e re-insere (mais simples e seguro)
+    await api.del('exames?protocolo_id=eq.' + protoId);
+    const exsClean = _editingExams.filter(e => (e.nome || '').trim());
+    if(exsClean.length){
+      const payload = exsClean.map((e, i) => ({
+        protocolo_id: protoId,
+        nome: e.nome.trim(),
+        atencao_basica: !!e.atencao_basica,
+        ordem: i + 1
+      }));
+      await api.post('exames', payload);
+    }
+    closeDrawer();
+    toast(_editingProtoId ? 'Protocolo atualizado' : 'Protocolo criado');
+    await loadProtocolos();
+  }catch(err){
+    console.error(err); toast('Erro ao salvar: ' + err.message, 'err');
+  }finally{
+    $('protoSaveBtn').disabled = false;
+  }
+};
+$('protoDeleteBtn').onclick = async () => {
+  if(!_editingProtoId) return;
+  const p = PROTOS_CACHE.find(x => x.id === _editingProtoId);
+  const ok = await confirm2({
+    title:'Excluir protocolo',
+    msg:`Excluir "${p?.titulo}"? Todos os exames vinculados também serão removidos.`,
+    danger:true, okLabel:'Excluir'
+  });
+  if(!ok) return;
+  try{
+    await api.del('protocolos?id=eq.' + _editingProtoId);
+    closeDrawer(); toast('Protocolo excluído'); loadProtocolos();
+  }catch(err){ toast('Erro: ' + err.message, 'err'); }
+};
+
+/* =================== USUÁRIOS =================== */
+let USERS_CACHE = [];
+async function loadUsuarios(){
+  $('userList').innerHTML = '<div class="loader"><div class="spin"></div></div>';
+  try{
+    USERS_CACHE = await api.get('usuarios?select=id,usuario,papel,expira_em,ativo,criado_em,atualizado_em&order=usuario');
+    renderUsuarios();
+  }catch(err){ console.error(err); toast('Erro ao carregar usuários', 'err'); }
+}
+function renderUsuarios(){
+  const q = $('userSearch').value.trim().toLowerCase();
+  let rows = USERS_CACHE;
+  if(q) rows = rows.filter(u => (u.usuario||'').toLowerCase().includes(q));
+  if(!rows.length){
+    $('userList').innerHTML = '<div class="empty-state"><div class="empty-state-title">Nenhum usuário</div></div>';
+    return;
+  }
+  const now = new Date();
+  $('userList').innerHTML = `
+    <table><thead><tr><th>Usuário</th><th>Papel</th><th>Expira em</th><th>Status</th><th style="text-align:right">Ações</th></tr></thead>
+    <tbody>${rows.map(u => {
+      const expired = u.expira_em && new Date(u.expira_em) <= now;
+      const isSelf = SESSION && u.id === SESSION.id;
+      return `
+      <tr>
+        <td>
+          <div class="t-title">${esc(u.usuario)}${isSelf ? ' <span style="color:var(--text-3);font-weight:400;font-size:11.5px;margin-left:6px">· você</span>' : ''}</div>
+          <div class="t-sub">Criado em ${esc(fmtDate(u.criado_em))}</div>
+        </td>
+        <td><span class="badge ${u.papel === 'admin' ? 'badge-admin' : 'badge-user'}">${u.papel === 'admin' ? 'Administrador' : 'Usuário'}</span></td>
+        <td>${ u.expira_em ? `<span class="${expired ? 'badge badge-danger' : 'badge badge-warn'}"><span class="badge-dot"></span>${esc(fmtDate(u.expira_em))}</span>` : '<span style="color:var(--text-3);font-size:12.5px">Sem expiração</span>' }</td>
+        <td>${ !u.ativo ? '<span class="badge badge-off"><span class="badge-dot"></span>Desativado</span>'
+              : expired ? '<span class="badge badge-danger"><span class="badge-dot"></span>Expirado</span>'
+              : '<span class="badge badge-ok"><span class="badge-dot"></span>Ativo</span>' }</td>
+        <td><div class="t-actions">
+          <button class="btn btn-ghost btn-icon" data-edit-user="${u.id}" title="Editar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+          ${isSelf ? '' : `<button class="btn btn-danger-ghost btn-icon" data-del-user="${u.id}" title="Excluir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>`}
+        </div></td>
+      </tr>`;
+    }).join('')}</tbody></table>`;
+  $$('[data-edit-user]').forEach(b => b.onclick = () => formUsuario(USERS_CACHE.find(u => u.id === b.dataset.editUser)));
+  $$('[data-del-user]').forEach(b => b.onclick = () => deleteUsuario(b.dataset.delUser));
+}
+$('userSearch').addEventListener('input', renderUsuarios);
+$('newUserBtn').onclick = () => formUsuario();
+
+function formUsuario(u){
+  const editing = !!u;
+  const expDateValue = u?.expira_em ? new Date(u.expira_em).toISOString().slice(0,10) : '';
+  modal({
+    title: editing ? 'Editar usuário' : 'Novo usuário',
+    body: `
+      <div class="field-row">
+        <div class="field"><label class="lbl">Usuário</label><input class="inp" id="m_u_user" value="${esc(u?.usuario || '')}" ${editing ? 'disabled' : ''}></div>
+        <div class="field"><label class="lbl">${editing ? 'Nova senha' : 'Senha'} ${editing ? '<span class="lbl-hint">deixe em branco p/ não trocar</span>' : ''}</label><input class="inp" id="m_u_senha" type="text" value=""></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label class="lbl">Papel</label>
+          <select class="sel" id="m_u_papel">
+            <option value="usuario" ${u?.papel === 'usuario' ? 'selected':''}>Usuário</option>
+            <option value="admin"   ${u?.papel === 'admin'   ? 'selected':''}>Administrador</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="lbl">Expira em <span class="lbl-hint">opcional</span></label>
+          <input class="inp" id="m_u_exp" type="date" value="${expDateValue}">
+        </div>
+      </div>
+      <label class="check"><input type="checkbox" id="m_u_ativo" ${(!u || u.ativo) ? 'checked':''}> Usuário ativo</label>
+    `,
+    actions: [
+      { label:'Cancelar', cls:'btn-ghost', onClick:closeModal },
+      { label: editing ? 'Salvar' : 'Criar', cls:'btn-primary', onClick: async () => {
+        const usuario = $('m_u_user').value.trim();
+        const senha   = $('m_u_senha').value;
+        const papel   = $('m_u_papel').value;
+        const exp     = $('m_u_exp').value;
+        const ativo   = $('m_u_ativo').checked;
+        if(!editing && !usuario) return toast('Informe o usuário', 'err');
+        if(!editing && !senha) return toast('Informe a senha', 'err');
+        const body = { papel, ativo, expira_em: exp ? new Date(exp + 'T23:59:59').toISOString() : null };
+        if(!editing){ body.usuario = usuario; body.senha = senha; }
+        else if(senha) body.senha = senha;
+        try{
+          if(editing) await api.patch('usuarios?id=eq.' + u.id, body);
+          else await api.post('usuarios', body);
+          closeModal(); toast(editing ? 'Usuário atualizado' : 'Usuário criado');
+          loadUsuarios();
+        }catch(err){
+          if(/duplicate/i.test(err.message)) toast('Já existe um usuário com esse nome', 'err');
+          else toast('Erro: ' + err.message, 'err');
+        }
+      }}
+    ]
+  });
+  setTimeout(() => (editing ? $('m_u_senha') : $('m_u_user')).focus(), 50);
+}
+async function deleteUsuario(id){
+  if(SESSION && id === SESSION.id) return toast('Você não pode excluir seu próprio usuário', 'warn');
+  const u = USERS_CACHE.find(x => x.id === id);
+  // checa último admin
+  if(u?.papel === 'admin'){
+    const admins = USERS_CACHE.filter(x => x.papel === 'admin' && x.ativo);
+    if(admins.length <= 1) return toast('Não é possível excluir o último administrador', 'warn');
+  }
+  const ok = await confirm2({ title:'Excluir usuário', msg:`Excluir "${u?.usuario}"? Esta ação não pode ser desfeita.`, danger:true, okLabel:'Excluir' });
+  if(!ok) return;
+  try{ await api.del('usuarios?id=eq.' + id); toast('Usuário excluído'); loadUsuarios(); }
+  catch(err){ toast('Erro: ' + err.message, 'err'); }
+}
+
+/* =================== Init =================== */
+go(location.hash.replace('#','') || 'dashboard');
+</script>
+</body>
+</html>

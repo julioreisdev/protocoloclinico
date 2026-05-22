@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e9e6e">
+<title>Protocolo Clínico</title>
+<link rel="icon" type="image/png" href="https://icons.iconarchive.com/icons/iconshock/super-vista-medical/256/stethoscope-icon.png">
+<style>
+:root{
+  --bg:#f4f7f5;
+  --bg-2:#eef3ef;
+  --surface:#ffffff;
+  --surface-2:#fafbfa;
+  --text:#0d1a13;
+  --text-2:#566661;
+  --text-3:#8a9994;
+  --bdr:rgba(13,26,19,.08);
+  --bdr-2:rgba(13,26,19,.16);
+  --primary:#0e9e6e;
+  --primary-d:#0a8459;
+  --primary-soft:#e7f5ee;
+  --primary-soft-2:#d4ecdf;
+  --accent:#c97c00;
+  --accent-soft:#fbf2e0;
+  --accent-bdr:#ebd4a4;
+  --info:#185fa5;
+  --info-soft:#e7f0fb;
+  --info-bdr:#b9d1ee;
+  --danger:#c14a35;
+  --danger-soft:#fbece8;
+  --shadow-sm:0 1px 2px rgba(13,26,19,.04);
+  --shadow-md:0 1px 2px rgba(13,26,19,.04),0 12px 32px -8px rgba(13,26,19,.10);
+  --r:14px;
+  --rs:10px;
+  --rxs:8px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  color:var(--text);
+  background:var(--bg);
+  font-size:15px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+
+/* ============ Header ============ */
+body{padding-top:var(--header-h,180px)}     /* spacer ocupando a altura real do header */
+header{
+  background:var(--surface);
+  border-bottom:1px solid var(--bdr);
+  position:fixed;top:0;left:0;right:0;z-index:30;
+  box-shadow:0 1px 8px rgba(13,26,19,.03);
+  /* camada de composição própria — evita sub-pixel/jitter */
+  transform:translateZ(0);
+  -webkit-backface-visibility:hidden;
+          backface-visibility:hidden;
+  contain:layout paint;
+}
+.h-inner{max-width:1040px;margin:0 auto;padding:14px 22px 12px}
+.h-top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.h-brand{display:flex;align-items:center;gap:11px;min-width:0}
+.h-logo{
+  width:40px;height:40px;border-radius:11px;
+  background:var(--primary-soft);
+  border:1px solid var(--primary-soft-2);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.h-logo img{width:28px;height:28px}
+.h-title{font-size:15.5px;font-weight:650;letter-spacing:-.005em;line-height:1.2}
+.h-sub{font-size:11.5px;color:var(--text-3);margin-top:2px;line-height:1.2}
+.h-spacer{flex:1}
+.user-chip{
+  display:flex;align-items:center;gap:8px;
+  padding:5px 10px 5px 5px;
+  background:var(--bg-2);
+  border:1px solid var(--bdr);
+  border-radius:999px;
+}
+.avatar{
+  width:28px;height:28px;border-radius:50%;
+  background:var(--primary);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12.5px;font-weight:600;flex-shrink:0;text-transform:uppercase;
+}
+.user-name{font-size:12.5px;font-weight:600;line-height:1;color:var(--text)}
+.user-role{font-size:10.5px;color:var(--text-3);line-height:1;margin-top:2px}
+.h-actions{display:flex;align-items:center;gap:6px;margin-left:8px}
+.icon-btn{
+  background:transparent;border:1px solid transparent;
+  width:34px;height:34px;border-radius:var(--rxs);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  color:var(--text-2);transition:background .12s, color .12s, border-color .12s;
+}
+.icon-btn:hover{background:var(--bg-2);color:var(--text)}
+.icon-btn.danger:hover{background:var(--danger-soft);color:var(--danger);border-color:rgba(193,74,53,.25)}
+.icon-btn svg{width:16px;height:16px}
+
+/* ============ Legend ============ */
+.legend{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.legend-label{font-size:12.5px;font-weight:550;color:var(--text-2)}
+.badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:20px;
+  border:1px solid;letter-spacing:.01em;
+}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.badge-ab{background:var(--primary-soft);color:var(--primary-d);border-color:var(--primary-soft-2)}
+.badge-ab .dot{background:var(--primary)}
+.badge-ref{background:var(--accent-soft);color:var(--accent);border-color:var(--accent-bdr)}
+.badge-ref .dot{background:var(--accent)}
+.legend-hint{font-size:11.5px;color:var(--text-3)}
+
+/* ============ Controls ============ */
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.search{position:relative;flex:1;min-width:200px}
+.search input{
+  width:100%;padding:9px 12px 9px 34px;
+  background:var(--surface);border:1px solid var(--bdr-2);border-radius:var(--rs);
+  font-size:13.5px;outline:none;
+  transition:border .12s, box-shadow .12s;
+}
+.search input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(14,158,110,.13)}
+.search svg{position:absolute;top:50%;left:11px;transform:translateY(-50%);width:14px;height:14px;color:var(--text-3)}
+.tog{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:12.5px;color:var(--text-2);cursor:pointer;
+  padding:6px 12px;background:var(--surface);
+  border:1px solid var(--bdr-2);border-radius:20px;
+  user-select:none;white-space:nowrap;
+  transition:background .12s, color .12s, border-color .12s;
+}
+.tog input{
+  width:14px;height:14px;accent-color:var(--primary);cursor:pointer;
+}
+.tog:hover{background:var(--bg-2)}
+.cats{display:flex;gap:6px;flex-wrap:wrap}
+.cb{
+  font-size:12.5px;padding:5px 12px;cursor:pointer;
+  border-radius:20px;border:1px solid var(--bdr-2);
+  background:var(--surface);color:var(--text-2);
+  transition:all .12s;white-space:nowrap;font-weight:500;
+}
+.cb:hover{background:var(--bg-2);color:var(--text)}
+.cb.on{background:var(--info-soft);color:var(--info);border-color:var(--info-bdr);font-weight:600}
+
+/* ============ Main ============ */
+main{max-width:1040px;margin:0 auto;padding:18px 18px 60px}
+.stats{font-size:12.5px;color:var(--text-3);margin-bottom:14px}
+.stats strong{color:var(--text-2);font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+
+.card{
+  background:var(--surface);
+  border:1px solid var(--bdr);
+  border-radius:var(--r);
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  cursor:pointer;
+  transition:border-color .12s, box-shadow .12s, transform .08s;
+  position:relative;
+}
+.card:hover{border-color:var(--bdr-2);box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.card.open{grid-column:1/-1;cursor:default;transform:none}
+.card.open:hover{transform:none}
+.card-top{padding:14px 16px 12px}
+.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px}
+.c-title{font-size:14px;font-weight:650;color:var(--text);line-height:1.3;letter-spacing:-.005em}
+.c-cid{
+  font-size:10.5px;color:var(--text-3);white-space:nowrap;padding-top:2px;
+  background:var(--bg-2);padding:2px 7px;border-radius:6px;font-weight:600;
+}
+.c-cat{font-size:11.5px;color:var(--text-3);margin-bottom:9px;font-weight:500}
+.c-exams{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px;min-height:22px}
+.pill{
+  display:inline-flex;align-items:center;gap:4px;font-size:10.5px;
+  padding:2px 7px;border-radius:20px;border:1px solid;line-height:1.4;font-weight:550;
+}
+.pill .dot{width:4px;height:4px}
+.pab{background:var(--primary-soft);color:var(--primary-d);border-color:var(--primary-soft-2)}
+.pab .dot{background:var(--primary)}
+.pref{background:var(--accent-soft);color:var(--accent);border-color:var(--accent-bdr)}
+.pref .dot{background:var(--accent)}
+.c-count{font-size:11px;color:var(--text-3)}
+.expand-hint{font-size:11px;color:var(--info);margin-top:6px;text-align:right;font-weight:550}
+
+.card-body{display:none;border-top:1px solid var(--bdr)}
+.card.open .card-body{display:block}
+.tabs{
+  display:flex;border-bottom:1px solid var(--bdr);
+  background:var(--surface-2);overflow-x:auto;
+}
+.tab{
+  flex-shrink:0;font-size:12.5px;font-weight:550;
+  padding:10px 16px;cursor:pointer;color:var(--text-3);
+  border:none;background:none;
+  border-bottom:2px solid transparent;
+  white-space:nowrap;transition:all .12s;
+}
+.tab:hover{color:var(--text)}
+.tab.on{color:var(--info);border-bottom-color:var(--info)}
+.tab-content{display:none;padding:16px 20px;max-height:460px;overflow-y:auto}
+.tab-content.on{display:block}
+.proto-text{
+  font-size:13.5px;color:var(--text);
+  white-space:pre-wrap;line-height:1.7;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
+}
+.exams-grid{display:flex;flex-wrap:wrap;gap:6px;padding:14px 20px}
+.close-btn{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  font-size:12.5px;color:var(--text-2);cursor:pointer;
+  padding:11px;background:var(--surface-2);
+  border:none;border-top:1px solid var(--bdr);width:100%;
+  font-weight:550;transition:background .12s, color .12s;
+}
+.close-btn:hover{background:var(--bg-2);color:var(--text)}
+.close-btn svg{width:13px;height:13px}
+
+.empty{
+  text-align:center;padding:48px 24px;
+  background:var(--surface);border:1px solid var(--bdr);
+  border-radius:var(--r);color:var(--text-3);
+}
+.empty-title{font-size:14px;font-weight:600;color:var(--text-2);margin-bottom:4px}
+.empty-sub{font-size:12.5px}
+
+.loader{display:flex;justify-content:center;padding:60px}
+.spin{
+  width:28px;height:28px;border-radius:50%;
+  border:3px solid var(--bdr-2);border-top-color:var(--primary);
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ============ Toast ============ */
+.toast-wrap{
+  position:fixed;bottom:18px;right:18px;z-index:100;
+  display:flex;flex-direction:column-reverse;gap:8px;
+  pointer-events:none;
+}
+.toast{
+  background:var(--surface);
+  border:1px solid var(--bdr);
+  border-left:3px solid var(--primary);
+  border-radius:var(--rs);
+  padding:11px 14px;min-width:230px;max-width:360px;
+  font-size:13px;color:var(--text);
+  box-shadow:var(--shadow-md);
+  display:flex;align-items:flex-start;gap:10px;
+  pointer-events:auto;
+  transform:translateX(10px);opacity:0;
+  animation:toastIn .25s ease forwards;
+}
+.toast.err{border-left-color:var(--danger)}
+.toast.warn{border-left-color:#a86b00}
+.toast svg{width:16px;height:16px;flex-shrink:0;margin-top:1px;color:var(--primary)}
+.toast.err svg{color:var(--danger)}
+@keyframes toastIn{to{transform:translateX(0);opacity:1}}
+
+/* ============ Responsive ============ */
+@media(max-width:640px){
+  .h-inner{padding:12px 14px}
+  .h-sub{display:none}
+  main{padding:14px 12px 60px}
+  .grid{grid-template-columns:1fr}
+  .ctrl{gap:6px}
+}
+@media(max-width:420px){
+  .user-name,.user-role{display:none}
+  .user-chip{padding:5px}
+}
+
+/* ============ Print ============ */
+@media print{
+  header{position:static;box-shadow:none}
+  .h-actions,.icon-btn,.ctrl,.cats,.legend,.expand-hint,.close-btn,.tab,.tabs{display:none!important}
+  .card{break-inside:avoid;border-color:#ccc!important}
+  .card-body{display:block!important;border-top:1px solid #ccc!important}
+  .tab-content{display:block!important;max-height:none!important;padding:8px 0!important}
+  body{background:#fff}
+}
+@media(prefers-reduced-motion: reduce){
+  *{transition:none!important;animation-duration:.001s!important}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-inner">
+    <div class="h-top">
+      <div class="h-brand">
+        <div class="h-logo"><img src="https://icons.iconarchive.com/icons/iconshock/super-vista-medical/256/stethoscope-icon.png" alt=""></div>
+        <div style="min-width:0">
+          <div class="h-title">Protocolo Clínico</div>
+          <div class="h-sub">Atenção Básica × Referência / Especialidade</div>
+        </div>
+      </div>
+      <div class="h-spacer"></div>
+      <div class="user-chip" title="Usuário logado">
+        <div class="avatar" id="userAvatar">?</div>
+        <div style="min-width:0">
+          <div class="user-name" id="userName">—</div>
+          <div class="user-role" id="userRole">—</div>
+        </div>
+      </div>
+      <div class="h-actions">
+        <a class="icon-btn" id="adminLink" href="admin.html" title="Painel administrativo" style="display:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </a>
+        <button class="icon-btn danger" id="logoutBtn" title="Sair">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="legend">
+      <span class="legend-label">Legenda:</span>
+      <span class="badge badge-ab"><span class="dot"></span>Atenção Básica</span>
+      <span class="badge badge-ref"><span class="dot"></span>Referência / Especialidade</span>
+      <span class="legend-hint">· Clique no card para ver o protocolo completo</span>
+    </div>
+
+    <div class="ctrl">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="search" id="q" placeholder="Buscar doença, CID ou exame…">
+      </div>
+      <label class="tog"><input type="checkbox" id="onlyAB"> Somente exames da AB</label>
+    </div>
+
+    <div class="cats" id="cats"></div>
+  </div>
+</header>
+
+<main>
+  <div class="stats" id="stats"></div>
+  <div id="grid" class="grid">
+    <div class="loader" style="grid-column:1/-1"><div class="spin"></div></div>
+  </div>
+</main>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+/* =================== Config / Session =================== */
+const SUPA_URL = 'https://nqmyzolpoffpazsgycqq.supabase.co';
+const SUPA_KEY = 'sb_publishable_N_f8dizm3fFs-T91K3dY-w_9q7KZIPt';
+
+let SESSION = null;
+try{ SESSION = JSON.parse(localStorage.getItem('pc_session') || 'null'); }catch{}
+
+function forceLogout(reason){
+  localStorage.removeItem('pc_session');
+  if(reason){
+    try{ sessionStorage.setItem('pc_logout_reason', reason); }catch{}
+  }
+  location.replace('login.html');
+}
+if(!SESSION || !SESSION.usuario || !SESSION.id){ forceLogout(); }
+
+/* =================== Helpers =================== */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function toast(msg, type='ok'){
+  const el = document.createElement('div');
+  el.className = 'toast' + (type === 'err' ? ' err' : type === 'warn' ? ' warn' : '');
+  const icon = type === 'err'
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  el.innerHTML = icon + '<div>' + esc(msg) + '</div>';
+  $('toastWrap').appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateX(10px)'; setTimeout(() => el.remove(), 220); }, 3000);
+}
+
+/* =================== Supabase REST =================== */
+const baseHeaders = { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY };
+async function sb(path){
+  const res = await fetch(SUPA_URL + '/rest/v1/' + path, { headers: baseHeaders });
+  if(!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+/* =================== Session validation =================== */
+async function validateSession(){
+  try{
+    const rows = await sb('usuarios?id=eq.' + encodeURIComponent(SESSION.id) + '&select=id,usuario,senha,papel,expira_em,ativo&limit=1');
+    if(!rows.length) return forceLogout('Sua conta foi removida.');
+    const u = rows[0];
+    if(!u.ativo) return forceLogout('Sua conta foi desativada.');
+    if(u.expira_em && new Date(u.expira_em) <= new Date()) return forceLogout('Seu acesso expirou.');
+    // detecta troca de senha em outra sessão (assumindo que login original guarda o id; se senha mudou, força logout — opcional)
+    // mantemos session em sincronia com papel atual
+    if(u.papel !== SESSION.papel){
+      SESSION.papel = u.papel;
+      localStorage.setItem('pc_session', JSON.stringify(SESSION));
+      $('userRole').textContent = u.papel === 'admin' ? 'Administrador' : 'Usuário';
+      $('adminLink').style.display = u.papel === 'admin' ? '' : 'none';
+    }
+    return true;
+  }catch(err){
+    console.warn('validateSession falhou (rede?):', err.message);
+    // não desloga em erro de rede — apenas registra
+    return null;
+  }
+}
+
+/* =================== UI: header session =================== */
+$('userName').textContent = SESSION.usuario;
+$('userRole').textContent = SESSION.papel === 'admin' ? 'Administrador' : 'Usuário';
+$('userAvatar').textContent = (SESSION.usuario || '?').slice(0,1);
+$('adminLink').style.display = SESSION.papel === 'admin' ? '' : 'none';
+$('logoutBtn').onclick = () => forceLogout();
+
+/* =================== Data & state =================== */
+let CATEGORIAS = [];   // [{id, nome, ordem}]
+let PROTOS = [];       // [{id, chave, titulo, cid, texto, categoria_id, categoria:{nome}, exames:[{nome,atencao_basica,ordem}]}]
+let q = '';
+let activeCat = 'Todos';
+let onlyAB = false;
+let openKey = null;
+
+async function loadData(){
+  try{
+    const [cats, protos, exames] = await Promise.all([
+      sb('categorias?select=id,nome,ordem&order=ordem'),
+      sb('protocolos?select=id,chave,titulo,cid,texto,categoria_id,categoria:categorias(id,nome)&order=titulo'),
+      sb('exames?select=protocolo_id,nome,atencao_basica,ordem&order=ordem')
+    ]);
+    CATEGORIAS = cats;
+    const byProto = {};
+    exames.forEach(e => (byProto[e.protocolo_id] = byProto[e.protocolo_id] || []).push(e));
+    PROTOS = protos.map(p => ({ ...p, exames: byProto[p.id] || [] }));
+    renderCats();
+    render();
+  }catch(err){
+    console.error(err);
+    $('grid').innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="empty-title">Não foi possível carregar</div><div class="empty-sub">Verifique sua conexão e atualize a página</div></div>';
+    toast('Erro ao carregar dados', 'err');
+  }
+}
+
+function renderCats(){
+  const cats = ['Todos', ...CATEGORIAS.map(c => c.nome)];
+  $('cats').innerHTML = cats.map(c =>
+    `<button class="cb ${c === activeCat ? 'on' : ''}" data-cat="${esc(c)}">${esc(c)}</button>`
+  ).join('');
+  Array.from(document.querySelectorAll('[data-cat]')).forEach(b => {
+    b.onclick = () => { activeCat = b.dataset.cat; openKey = null; renderCats(); render(); };
+  });
+}
+
+function makeCard(p){
+  const isOpen = openKey === p.chave;
+  let exs = p.exames;
+  if(onlyAB) exs = exs.filter(e => e.atencao_basica);
+  const ab = p.exames.filter(e => e.atencao_basica).length;
+  const ref = p.exames.length - ab;
+  const pills = exs.map(e => `<span class="pill ${e.atencao_basica ? 'pab' : 'pref'}"><span class="dot"></span>${esc(e.nome)}</span>`).join('');
+  const tabsHtml = isOpen ? `
+    <div class="tabs">
+      <button class="tab on" data-tab="t_proto_${esc(p.chave)}">Protocolo</button>
+      <button class="tab" data-tab="t_exames_${esc(p.chave)}">Exames (${p.exames.length})</button>
+    </div>
+    <div class="tab-content on" id="t_proto_${esc(p.chave)}">
+      <div class="proto-text">${esc(p.texto || '—')}</div>
+    </div>
+    <div class="tab-content" id="t_exames_${esc(p.chave)}">
+      <div class="exams-grid">${p.exames.map(e => `<span class="pill ${e.atencao_basica ? 'pab' : 'pref'}"><span class="dot"></span>${esc(e.nome)}</span>`).join('') || '<span style="color:var(--text-3);font-size:12.5px">Sem exames cadastrados</span>'}</div>
+    </div>
+    <button class="close-btn" data-close="1">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      Fechar
+    </button>
+  ` : '';
+  return `
+    <div class="card ${isOpen ? 'open' : ''}" data-key="${esc(p.chave)}">
+      <div class="card-top">
+        <div class="card-head">
+          <span class="c-title">${esc(p.titulo)}</span>
+          ${p.cid ? `<span class="c-cid">${esc(p.cid)}</span>` : ''}
+        </div>
+        <div class="c-cat">${esc(p.categoria?.nome || '')}</div>
+        <div class="c-exams">${pills || '<span style="font-size:11px;color:var(--text-3)">—</span>'}</div>
+        <div class="c-count">AB: ${ab} · Referência: ${ref}</div>
+        ${!isOpen ? '<div class="expand-hint">↓ Ver protocolo completo</div>' : ''}
+      </div>
+      <div class="card-body">${tabsHtml}</div>
+    </div>`;
+}
+
+function render(){
+  const ql = q.trim().toLowerCase();
+  const filtered = PROTOS.filter(p => {
+    if(activeCat !== 'Todos' && (p.categoria?.nome || '') !== activeCat) return false;
+    if(ql){
+      const mD = (p.titulo||'').toLowerCase().includes(ql) ||
+                 (p.cid||'').toLowerCase().includes(ql) ||
+                 (p.texto||'').toLowerCase().includes(ql);
+      const mE = (p.exames || []).some(e => (e.nome||'').toLowerCase().includes(ql));
+      if(!mD && !mE) return false;
+    }
+    return true;
+  });
+  const totalAB = filtered.reduce((s,p) => s + p.exames.filter(e => e.atencao_basica).length, 0);
+  const totalRef = filtered.reduce((s,p) => s + p.exames.filter(e => !e.atencao_basica).length, 0);
+  $('stats').innerHTML = `<strong>${filtered.length}</strong> ${filtered.length===1?'protocolo':'protocolos'} · <strong>${totalAB}</strong> exames AB · <strong>${totalRef}</strong> de referência`;
+  if(!filtered.length){
+    $('grid').innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="empty-title">Nenhum resultado</div><div class="empty-sub">Ajuste a busca ou troque a categoria</div></div>';
+    return;
+  }
+  $('grid').innerHTML = filtered.map(makeCard).join('');
+  // bind clicks
+  Array.from(document.querySelectorAll('.card')).forEach(card => {
+    if(card.classList.contains('open')){
+      Array.from(card.querySelectorAll('.tab')).forEach(t => {
+        t.onclick = () => {
+          const id = t.dataset.tab;
+          Array.from(card.querySelectorAll('.tab')).forEach(x => x.classList.remove('on'));
+          Array.from(card.querySelectorAll('.tab-content')).forEach(x => x.classList.remove('on'));
+          t.classList.add('on');
+          card.querySelector('#' + id).classList.add('on');
+        };
+      });
+      const cb = card.querySelector('[data-close]');
+      if(cb) cb.onclick = e => { e.stopPropagation(); openKey = null; render(); };
+    } else {
+      card.onclick = () => {
+        openKey = card.dataset.key;
+        render();
+        setTimeout(() => {
+          const el = document.querySelector('.card.open');
+          if(el) el.scrollIntoView({ behavior:'smooth', block:'start' });
+        }, 50);
+      };
+    }
+  });
+}
+
+$('q').addEventListener('input', e => { q = e.target.value; openKey = null; render(); });
+$('onlyAB').addEventListener('change', e => { onlyAB = e.target.checked; render(); });
+
+/* =================== Header height tracking =================== */
+const headerEl = document.querySelector('header');
+const updateHeaderH = () => {
+  const h = Math.ceil(headerEl.getBoundingClientRect().height);
+  document.documentElement.style.setProperty('--header-h', h + 'px');
+};
+updateHeaderH();
+if(window.ResizeObserver){ new ResizeObserver(updateHeaderH).observe(headerEl); }
+window.addEventListener('resize', updateHeaderH);
+window.addEventListener('orientationchange', updateHeaderH);
+
+/* =================== Boot =================== */
+(async () => {
+  const ok = await validateSession();
+  if(ok === false) return; // já redirecionou
+  await loadData();
+  // revalida periodicamente (1 min) e quando o tab volta a ficar visível
+  setInterval(validateSession, 60_000);
+  document.addEventListener('visibilitychange', () => {
+    if(document.visibilityState === 'visible') validateSession();
+  });
+})();
+</script>
+</body>
+</html>
